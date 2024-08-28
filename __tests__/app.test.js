@@ -4,6 +4,9 @@ const db = require("../db/connection");
 const data = require("../db/data/test-data/index");
 const app = require("../app");
 
+const{articleData} = data;
+
+
 beforeEach(() => seed(data));
 afterAll(() => db.end());
 
@@ -80,3 +83,40 @@ describe("GET /api", () => {
         });
     });
   });
+
+  describe('GET /api/articles/:article_id', () => {
+    test('200: responds with an article object with the correct properties', () => {
+        return request(app)
+            .get('/api/articles/1')
+            .expect(200)
+            .then(({ body: { article } }) => {
+                expect(article).toEqual({
+                    article_id: 1,
+                    title: expect.any(String),
+                    body: expect.any(String),
+                    votes: expect.any(Number),
+                    topic: expect.any(String),
+                    author: expect.any(String),
+                    created_at: expect.any(String),
+                    article_img_url: expect.any(String)
+                });
+            });
+    });
+    test('404: responds with an error when article_id does not exist', () => {
+        return request(app)
+            .get('/api/articles/9999')
+            .expect(404)
+            .then(({ body }) => {
+                expect(body.msg).toBe('Article not found');
+            });
+    });
+
+    test('400: responds with an error when article_id is not a valid number', () => {
+        return request(app)
+            .get('/api/articles/not-a-number')
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe('Invalid article ID');
+            });
+    });
+});
