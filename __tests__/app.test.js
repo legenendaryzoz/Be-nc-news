@@ -129,3 +129,46 @@ describe('GET /api/articles', () => {
         });
     });
   });
+  describe('GET /api/articles/:article_id/comments', () => {
+    test('200: responds with an array of comments for the given article_id, sorted by date in descending order', () => {
+        return request(app)
+            .get('/api/articles/1/comments')
+            .expect(200)
+            .then(({ body: { comments } }) => {
+                expect(Array.isArray(comments)).toBe(true);
+                expect(comments.length).toBeGreaterThan(0);
+                comments.forEach(comment => {
+                    expect(comment).toHaveProperty('comment_id', expect.any(Number));
+                    expect(comment).toHaveProperty('votes', expect.any(Number));
+                    expect(comment).toHaveProperty('created_at', expect.any(String));
+                    expect(comment).toHaveProperty('author', expect.any(String));
+                    expect(comment).toHaveProperty('body', expect.any(String));
+                    expect(comment).toHaveProperty('article_id', 1);
+                });
+                for (let i = 0; i < comments.length - 1; i++) {
+                    const currentDate = new Date(comments[i].created_at).getTime();
+                    const nextDate = new Date(comments[i + 1].created_at).getTime();
+                    expect(currentDate).toBeGreaterThanOrEqual(nextDate);
+                }
+            });
+    });
+
+    test('400: responds with an error when article_id is not a valid ID', () => {
+        return request(app)
+            .get('/api/articles/not-a-number/comments')
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe('Invalid article ID');
+            });
+    });
+
+    test('200: responds with an empty array when article_id exists but there are no comments', () => {
+        return request(app)
+            .get('/api/articles/2/comments')
+            .expect(200)
+            .then(({ body: { comments } }) => {
+                expect(Array.isArray(comments)).toBe(true);
+                expect(comments.length).toBe(0);
+            });
+    });
+});

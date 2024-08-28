@@ -3,12 +3,14 @@ const {getTopics} = require('./endpoints/controllers/topics.controller');
 const {getEndpoints} = require('./endpoints/controllers/api.controller');
 const {getArticleById} = require('./endpoints/controllers/articles.controller');
 const { getArticles } = require('./endpoints/controllers/article.controller');
+const { getCommentsByArticleId } = require('./endpoints/controllers/comments.controller');
 const app = express();
 
 app.get('/api/topics', getTopics);
 app.get('/api', getEndpoints);
 app.get('/api/articles/:article_id', getArticleById);
 app.get('/api/articles', getArticles);
+app.get('/api/articles/:article_id/comments', getCommentsByArticleId);
 
 app.use((req, res, next) => {
     res.status(404).json({ message: 'Endpoint not found' });
