@@ -2,9 +2,10 @@ const request = require("supertest");
 const seed = require("../db/seeds/seed");
 const db = require("../db/connection");
 const data = require("../db/data/test-data/index");
+const endpoints = require('../endpoints.json');
 const app = require("../app");
 
-const{articleData} = data;
+
 
 
 beforeEach(() => seed(data));
@@ -34,46 +35,16 @@ describe("GET/api/tpics", () => {
 });
 describe("GET /api", () => {
     test("200: responds with API documentation", () => {
-      return request(app)
-        .get('/api')
-        .expect(200)
-        .then(({ body }) => {
-          expect(body).toHaveProperty('GET /api');
-          expect(body).toHaveProperty('GET /api/topics');
-          expect(body).toHaveProperty('GET /api/articles');
-
-          expect(body['GET /api']).toEqual({
-            description: "serves up a json representation of all the available endpoints of the api"
-          });
-
-          expect(body['GET /api/topics']).toEqual({
-            description: "serves an array of all topics",
-            queries: [],
-            exampleResponse: {
-              topics: [{ "slug": "football", "description": "Footie!" }]
-            }
-          });
-
-          expect(body['GET /api/articles']).toEqual({
-            description: "serves an array of all articles",
-            queries: ["author", "topic", "sort_by", "order"],
-            exampleResponse: {
-              articles: [
-                {
-                  title: "Seafood substitutions are increasing",
-                  topic: "cooking",
-                  author: "weegembump",
-                  body: "Text from the article..",
-                  created_at: "2018-05-30T15:59:13.341Z",
-                  votes: 0,
-                  comment_count: 6
-                }
-              ]
-            }
-          });
-        });
+        return request(app)
+            .get('/api')
+            .expect(200)
+            .then(({ body }) => {
+                Object.keys(endpoints).forEach(endpoint => {
+                    expect(body).toHaveProperty(endpoint);
+                    expect(body[endpoint]).toEqual(endpoints[endpoint]);
+                });
+            });
     });
-
     test("404: responds with 404 for non-existent routes", () => {
       return request(app)
         .get('/api/nonexistent')
@@ -120,3 +91,41 @@ describe("GET /api", () => {
             });
     });
 });
+describe('GET /api/articles', () => {
+    test('200: responds with an array of articles sorted by date in descending order and without body property', () => {
+      return request(app)
+        .get('/api/articles')
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          expect(Array.isArray(articles)).toBe(true);
+          expect(articles.length).toBeGreaterThan(0);
+
+          for (let i = 0; i < articles.length - 1; i++) {
+            const currentDate = new Date(articles[i].created_at).getTime();
+            const nextDate = new Date(articles[i + 1].created_at).getTime();
+            expect(currentDate).toBeGreaterThanOrEqual(nextDate);
+          }
+
+          articles.forEach(article => {
+            expect(article).not.toHaveProperty('body');
+            expect(article).toHaveProperty('article_id');
+            expect(article).toHaveProperty('title');
+            expect(article).toHaveProperty('topic');
+            expect(article).toHaveProperty('author');
+            expect(article).toHaveProperty('created_at');
+            expect(article).toHaveProperty('votes');
+            expect(article).toHaveProperty('article_img_url');
+            expect(article).toHaveProperty('comment_count');
+          });
+        });
+    });
+
+    test('404: responds with an error when querying with an invalid query', () => {
+      return request(app)
+        .get('/api/articles?invalid_query=some_value')
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe('Invalid query');
+        });
+    });
+  });
