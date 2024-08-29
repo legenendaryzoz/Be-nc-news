@@ -1,4 +1,4 @@
-// article.controller.js
+
 const { fetchArticles } = require('../models/article.model');
 
 exports.getArticles = (req, res, next) => {
