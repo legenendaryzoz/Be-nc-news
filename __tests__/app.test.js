@@ -172,3 +172,79 @@ describe('GET /api/articles', () => {
             });
     });
 });
+describe('POST /api/articles/:article_id/comments', () => {
+    test('201: responds with the newly posted comment', () => {
+        const newComment = {
+            username: 'butter_bridge',
+            body: 'Great article!'
+        };
+        return request(app)
+            .post('/api/articles/1/comments')
+            .send(newComment)
+            .expect(201)
+            .then(({ body: { comment } }) => {
+                expect(comment).toHaveProperty('comment_id', expect.any(Number));
+                expect(comment).toHaveProperty('votes', 0);
+                expect(comment).toHaveProperty('created_at', expect.any(String));
+                expect(comment).toHaveProperty('author', 'butter_bridge');
+                expect(comment).toHaveProperty('body', 'Great article!');
+                expect(comment).toHaveProperty('article_id', 1);
+            });
+    });
+
+    test('400: responds with an error when missing required fields', () => {
+        const newComment = {
+            body: 'Great article!'
+        };
+        return request(app)
+            .post('/api/articles/1/comments')
+            .send(newComment)
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe('Missing required fields');
+            });
+    });
+
+    test('404: responds with an error when article_id does not exist', () => {
+        const newComment = {
+            username: 'butter_bridge',
+            body: 'Great article!'
+        };
+        return request(app)
+            .post('/api/articles/999/comments')
+            .send(newComment)
+            .expect(404)
+            .then(({ body }) => {
+                expect(body.msg).toBe('Article not found');
+            });
+    });
+
+
+    test('404: responds with an error when username does not exist', () => {
+        const newComment = {
+            username: 'non_existent_user',
+            body: 'Great article!'
+        };
+        return request(app)
+            .post('/api/articles/1/comments')
+            .send(newComment)
+            .expect(404)
+            .then(({ body }) => {
+                expect(body.msg).toBe('Username not found');
+            });
+    });
+
+    test('400: responds with an error when body is empty', () => {
+        const newComment = {
+            username: 'butter_bridge',
+            body: ''
+        };
+        return request(app)
+            .post('/api/articles/1/comments')
+            .send(newComment)
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe('Comment body cannot be empty');
+            });
+    });
+});
