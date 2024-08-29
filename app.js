@@ -8,6 +8,7 @@ const{postComment} = require('./endpoints/controllers/postcomments.controller');
 const { patchArticleVotes } = require('./endpoints/controllers/patcharticles.controller');
 const {deleteCommentById} = require('./endpoints/controllers/deletecomment.controller');
 const{getAllUsers} = require('./endpoints/controllers/newusers.controller');
+const{getSortedArticles} = require('./endpoints/controllers/sortedarticles.controller');
 const app = express();
 
 app.use(express.json());
@@ -21,6 +22,9 @@ app.post('/api/articles/:article_id/comments', postComment);
 app.patch('/api/articles/:article_id', patchArticleVotes);
 app.delete('/api/comments/:comment_id', deleteCommentById);
 app.get('/api/users', getAllUsers);
+app.get('/api/sorted-articles', getSortedArticles);
+
+
 
 
 app.use((req, res, next) => {

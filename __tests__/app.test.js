@@ -3,6 +3,7 @@ const seed = require("../db/seeds/seed");
 const db = require("../db/connection");
 const data = require("../db/data/test-data/index");
 const endpoints = require('../endpoints.json');
+require('jest-sorted');
 const app = require("../app");
 
 
@@ -319,6 +320,48 @@ describe('GET /api/users', () => {
                     expect(user).toHaveProperty('name');
                     expect(user).toHaveProperty('avatar_url');
                 });
+            });
+    });
+});
+
+describe('GET /api/sorted-articles', () => {
+    test('200: responds with articles sorted by date descending by default', () => {
+        return request(app)
+            .get('/api/sorted-articles')
+            .expect(200)
+            .then(({ body }) => {
+                expect(body).toHaveProperty('articles');
+                expect(body.articles.length).toBeGreaterThan(0);
+                expect(body.articles).toBeSortedBy('created_at', { descending: true });
+            });
+    });
+
+    test('200: responds with articles sorted by title ascending', () => {
+        return request(app)
+            .get('/api/sorted-articles?sort_by=title&order=asc')
+            .expect(200)
+            .then(({ body }) => {
+                expect(body).toHaveProperty('articles');
+                expect(body.articles.length).toBeGreaterThan(0);
+                expect(body.articles).toBeSortedBy('title', { ascending: true, caseInsensitive: true });
+            });
+    });
+
+    test('400: responds with an error for invalid sort_by column', () => {
+        return request(app)
+            .get('/api/sorted-articles?sort_by=invalid_column')
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe('Invalid sort column');
+            });
+    });
+
+    test('400: responds with an error for invalid order value', () => {
+        return request(app)
+            .get('/api/sorted-articles?order=invalid_order')
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe('Invalid order');
             });
     });
 });
