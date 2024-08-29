@@ -306,14 +306,15 @@ describe('DELETE /api/comments/:comment_id', () => {
     });
 });
 describe('GET /api/users', () => {
-    test('200: responds with an array of users with the correct properties', () => {
+    test('200: responds with an object containinga arr of users', () => {
         return request(app)
             .get('/api/users')
             .expect(200)
             .then(({ body }) => {
-                expect(Array.isArray(body)).toBe(true);
-                expect(body.length).toBeGreaterThan(0);
-                body.forEach(user => {
+                expect(body).toHaveProperty('users');
+                expect(Array.isArray(body.users)).toBe(true);
+                expect(body.users.length).toBeGreaterThan(0);
+                body.users.forEach(user => {
                     expect(user).toHaveProperty('username');
                     expect(user).toHaveProperty('name');
                     expect(user).toHaveProperty('avatar_url');
