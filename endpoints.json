@@ -75,5 +75,25 @@
         "article_id": 1
       }
     }
+  },
+  "PATCH /api/articles/:article_id": {
+    "description": "Updates the votes of an article by its article_id",
+    "requestBody": {
+      "inc_votes": "Number of votes to add  or subtract"
+    },
+    "exampleRequestBody": {
+      "inc_votes": 1
+    },
+    "exampleResponse": {
+      "article": {
+        "article_id": 1,
+        "title": "Sample Article",
+        "body": "This is a sample article.",
+        "votes": 101,
+        "topic": "General",
+        "author": "sample_author",
+        "created_at": "2024-01-01T00:00:00.000Z"
+      }
+    }
   }
 }

@@ -248,3 +248,35 @@ describe('POST /api/articles/:article_id/comments', () => {
             });
     });
 });
+
+describe('PATCH /api/articles/:article_id', () => {
+    test('200: responds with the updated article when incrementing votes', () => {
+        return request(app)
+            .patch('/api/articles/1')
+            .send({ inc_votes: 5 })
+            .expect(200)
+            .then(({ body }) => {
+                expect(body.article.votes).toBe(105);
+            });
+    });
+    test('200: responds with the updated article when decrementing votes', () => {
+        return request(app)
+            .patch('/api/articles/1')
+            .send({ inc_votes: -3 })
+            .expect(200)
+            .then(({ body }) => {
+                expect(body.article.votes).toBe(97);
+            });
+    });
+
+    test('400: responds with an error when missing inc_votes field', () => {
+        return request(app)
+            .patch('/api/articles/1')
+            .send({})
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe('Missing or invalid inc_votes field');
+            });
+    });
+
+});
