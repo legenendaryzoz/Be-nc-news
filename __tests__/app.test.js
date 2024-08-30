@@ -70,7 +70,8 @@ describe("GET /api", () => {
                     topic: expect.any(String),
                     author: expect.any(String),
                     created_at: expect.any(String),
-                    article_img_url: expect.any(String)
+                    article_img_url: expect.any(String),
+                    comment_count: expect.any(Number)
                 });
             });
     });
@@ -90,7 +91,18 @@ describe("GET /api", () => {
             .then(({ body }) => {
                 expect(body.msg).toBe('Invalid article ID');
             });
+
     });
+    test('200: responds with an article object that includes comment_count which should be a non-negative number ', () => {
+        return request(app)
+            .get('/api/articles/1')
+            .expect(200)
+            .then(({ body: { article } }) => {
+                expect(article).toHaveProperty('comment_count');
+                expect(article.comment_count).toBeGreaterThanOrEqual(0);
+            });
+    });
+
 });
 describe('GET /api/articles', () => {
     test('200: responds with an array of articles sorted by date in descending order and without body property', () => {
