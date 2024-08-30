@@ -129,6 +129,36 @@ describe('GET /api/articles', () => {
           expect(body.msg).toBe('Invalid query');
         });
     });
+    test('200: responds with articles filtered by topic', () => {
+        return request(app)
+          .get('/api/articles?topic=mitch')
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.articles).toHaveLength(12);
+            body.articles.forEach((article) => {
+              expect(article.topic).toBe('mitch');
+            });
+          });
+      });
+
+      test('404: responds with an empty array if no articles exist for this valid topic', () => {
+        return request(app)
+          .get('/api/articles?topic=some_valid_topic_with_no_articles')
+          .expect(404)
+          .then(({ body }) => {
+            expect(body.msg).toBe('No articles found for this topic');
+
+          });
+    });
+
+      test('404: responds with an error when no articles are found for the topic', () => {
+        return request(app)
+          .get('/api/articles?topic=nonexistent_topic')
+          .expect(404)
+          .then(({ body }) => {
+            expect(body.msg).toBe('No articles found for this topic');
+          });
+      });
   });
   describe('GET /api/articles/:article_id/comments', () => {
     test('200: responds with an array of comments for the given article_id, sorted by date in descending order', () => {

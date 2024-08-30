@@ -10,7 +10,7 @@
     }
   },
   "GET /api/articles": {
-    "description": "serves an array of all articles,sorted by date in descending order without the body.",
+    "description": "serves an array of all articles,sorted by date in descending order without the body.Added a filter by topic and author",
     "queries": ["author", "topic", "sort_by", "order"],
     "exampleResponse": {
       "articles": [
