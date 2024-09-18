@@ -10,7 +10,9 @@ const {deleteCommentById} = require('./endpoints/controllers/deletecomment.contr
 const{getAllUsers} = require('./endpoints/controllers/newusers.controller');
 const{getSortedArticles} = require('./endpoints/controllers/sortedarticles.controller');
 const app = express();
+const cors = require('cors');
 
+app.use(cors());
 app.use(express.json());
 
 app.get('/api/topics', getTopics);
