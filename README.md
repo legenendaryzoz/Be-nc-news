@@ -7,3 +7,4 @@ For instructions, please head over to [L2C NC News](https://l2c.northcoders.com/
 --- 
 
 This portfolio project was created as part of a Digital Skills Bootcamp in Software Engineering provided by [Northcoders](https://northcoders.com/)
+where i created a backend API using Node.js 
